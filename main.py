@@ -20,25 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 from ga import gene, chromosome, creature
-
+import operator
 
 def main():
     creatures = []
     # rs.EnableRedraw(False)
-    matrixSize = 1
+    matrixSize = 100
+    fintnessScore = {}
 
-    for i in range(-matrixSize,matrixSize):
-        for j in range(-matrixSize,matrixSize):
+    # for i in range(-matrixSize,matrixSize):
+    #     for j in range(-matrixSize,matrixSize):
+    for i in range(matrixSize):
+        firstGene = gene.Gene()
 
-            firstGene = gene.Gene()
+        cromosome = chromosome.Chromosome([firstGene])
+        cromosome.grow()
 
-            cromosome = chromosome.Chromosome([firstGene])
-            cromosome.grow()
+        beast = creature.Creature([cromosome])
+        # beast.render(i*15,j*15)
+        creatures.append(beast)
 
-            beast = creature.Creature([cromosome])
-            beast.render(i*15,j*15)
+        fintnessScore[i] = beast.beutifulScore()
 
-            creatures.append(beast)
+    sorted_x = sorted(fintnessScore.iteritems(), key=operator.itemgetter(1))
+    topBeasts = sorted_x[slice(0,int(matrixSize/20))]
+
+    i = 0
+    for beastIndex in topBeasts:
+        creatures[beastIndex[0]].render(i*15,0)
+        i+= 1
+
+
+
+    # creatures[bestIndex].render()
 
     # rs.EnableRedraw(True)
 

@@ -26,26 +26,81 @@ import rhinoscriptsyntax as rs
 class Creature:
     def __init__(self, chromosomeList):
         self.chromosomeList = chromosomeList
-        self.poligons = []
+        self.polygons = []
 
-    def render(self, locX = 0, locY = 0, locZ = 0):
+    def render(self, locX=0, locY=0, locZ=0):
         for chromosome in self.chromosomeList:
             for gene in chromosome.genes:
-                poligon = self.renderPolygon(gene.points, locX, locY, locZ)
-                self.poligons.append(poligon)
+                polygon = self.renderPolygon(gene.points, locX, locY, locZ)
+                self.polygons.append(polygon)
 
 
-    def renderPolygon(self,pts, offsetX, offsetY, offsetZ):
+    def renderPolygon(self, pts, offsetX, offsetY, offsetZ):
         surfaces = []
-        for x in range(4):
-            for y in range(4):
-                for z in range (4):
-                    if x!=y and x!=z and y!=x:
+        # for x in range(4):
+        #     for y in range(4):
+        #         for z in range(4):
+        #             if x != y and x != z and y != x:
+                        # surface = rs.AddSrfPt([
+                        #     [pts[x][0] + offsetX, pts[x][1] + offsetY, pts[x][2] + offsetZ],
+                        #     [pts[y][0] + offsetX, pts[y][1] + offsetY, pts[y][2] + offsetZ],
+                        #     [pts[z][0] + offsetX, pts[z][1] + offsetY, pts[z][2] + offsetZ]])
+                        # surfaces.append(surface)
+      # return surfaces
 
-                        surface = rs.AddSrfPt([
-                            [pts[x][0]+offsetX, pts[x][1]+offsetY, pts[x][2]+offsetZ],
-                            [pts[y][0]+offsetX, pts[y][1]+offsetY, pts[y][2]+offsetZ],
-                            [pts[z][0]+offsetX, pts[z][1]+offsetY, pts[z][2]+offsetZ]])
-                        surfaces.append(surface)
+        polyline = rs.AddPolyline([
+            [pts[0][0] + offsetX, pts[0][1] + offsetY, pts[0][2] + offsetZ],
+            [pts[1][0] + offsetX, pts[1][1] + offsetY, pts[1][2] + offsetZ],
+            [pts[2][0] + offsetX, pts[2][1] + offsetY, pts[2][2] + offsetZ],
+            [pts[0][0] + offsetX, pts[0][1] + offsetY, pts[0][2] + offsetZ]])
+        point = [pts[3][0] + offsetX, pts[3][1] + offsetY, pts[3][2] + offsetZ]
+        solid = rs.ExtrudeCurvePoint( polyline, point )
+        rs.DeleteObject(polyline)
 
-        return surfaces
+        # cup
+        # bool union
+        return solid
+
+    def sizeScore(self):
+        #find bounding box
+        minX = minY = minZ = 0
+        maxX = maxY = maxZ = 0
+        for chromosome in self.chromosomeList:
+            for gene in chromosome.genes:
+                for point in gene.points:
+                    if point[0] > maxX: maxX = point[0]
+                    if point[1] > maxY: maxY = point[1]
+                    if point[2] > maxZ: maxZ = point[2]
+
+                    if point[0] < minX: minX = point[0]
+                    if point[1] < minY: minY = point[1]
+                    if point[2] < minZ: minZ = point[2]
+
+        volume = abs(maxX-minX) * abs(maxY-minY) * abs(maxZ-minZ)
+        return volume
+
+    def beutifulScore(self):
+        totalScore = 0
+        genesCount = 0
+        for chromosome in self.chromosomeList:
+            for gene in chromosome.genes:
+                totalScore+= self.geneSymetryScore(gene)
+                genesCount+=1
+        return totalScore/genesCount
+
+    def geneSymetryScore(self, gene):
+        distances = []
+        # get distances
+        for point1 in gene.points:
+            for point2 in gene.points:
+                distances.append(rs.Distance(point1,point2))
+
+        offsets = []
+        # get offsets
+        for dis1 in distances:
+            for dis2 in distances:
+                if dis1 and dis2:
+                    offset = abs(dis1-dis2)
+                    offsets.append(offset)
+
+        return float(sum(offsets))/len(offsets)
