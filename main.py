@@ -19,42 +19,42 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from ga import gene, chromosome, creature
-import operator
+from ga import gene, chromosome, creature, evolution, fitness_equilateral, fitness_size, reproduction_divider
+
 
 def main():
     creatures = []
-    # rs.EnableRedraw(False)
-    matrixSize = 100
-    fintnessScore = {}
 
-    # for i in range(-matrixSize,matrixSize):
-    #     for j in range(-matrixSize,matrixSize):
-    for i in range(matrixSize):
+    # generate creatures
+    for i in range(100):
         firstGene = gene.Gene()
-
-        cromosome = chromosome.Chromosome([firstGene])
-        cromosome.grow()
-
-        beast = creature.Creature([cromosome])
-        # beast.render(i*15,j*15)
+        crmsome = chromosome.Chromosome([firstGene])
+        crmsome.grow(10)
+        beast = creature.Creature([crmsome])
         creatures.append(beast)
 
-        fintnessScore[i] = beast.beutifulScore()
+    # initialize evolution engine
+    fitnessAlgorithms = {
+        '500': fitness_equilateral.fitnessEquilateral(),
+        '0.3': fitness_size.fitnessSize()
+    }
+    reproductionAlgorithm = reproduction_divider.reproductionDivider()
 
-    sorted_x = sorted(fintnessScore.iteritems(), key=operator.itemgetter(1))
-    topBeasts = sorted_x[slice(0,int(matrixSize/20))]
+    engine = evolution.Evolution(creatures)
+    engine.population = engine.fitness(fitnessAlgorithms, 15)
 
+    for iteration in range(2):
+        engine.population = creatures + engine.reproduce(reproductionAlgorithm)
+        engine.population = engine.fitness(fitnessAlgorithms, 15)
+
+    #render the best creatures
     i = 0
-    for beastIndex in topBeasts:
-        creatures[beastIndex[0]].render(i*15,0)
-        i+= 1
-
-
-
-    # creatures[bestIndex].render()
-
-    # rs.EnableRedraw(True)
+    j = 0
+    for beast in engine.population:
+        print(beast.fitnessScore)
+        beast.render(i * 50, j * 50 )
+        i += 1
+        if not (i%5) : j+=1; i=0
 
 
 main()

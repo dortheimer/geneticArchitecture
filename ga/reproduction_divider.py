@@ -19,26 +19,19 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+from ga import creature,chromosome
+import random
 
-class Creature:
-    def __init__(self, chromosomeList):
-        self.chromosomeList = chromosomeList
-        self.renderedGenes = []
-        self.fitnessScore = 0
-        self.validate()
+class reproductionDivider:
+    def __init__(self):
+        return
 
-    def validate(self):
-        if type(self.chromosomeList) is not list:
-            raise TypeError("Creature must get a list of chromosomes. "+str(type(self.chromosomeList))+" given instead")
-
-        for chrmsm in self.chromosomeList:
-            if chrmsm.__class__.__name__ != 'Chromosome':
-                raise TypeError("Creature must get Chromosome object. "+str(chrmsm.__class__.__name__)+" given instead")
-            else:
-                chrmsm.validate()
-
-
-    def render(self, locX=0, locY=0, locZ=0):
-        for chromosome in self.chromosomeList:
-            for gene in chromosome.genes:
-                self.renderedGenes.append(gene.render(locX, locY, locZ))
+    def mitosis(self, creature1, creature2):
+        chromo = []
+        #cut this in half
+        for i in range(len(creature1.chromosomeList)):
+            cutIndex = random.randint(0,len(creature1.chromosomeList))
+            chromo.append(chromosome.Chromosome(
+                creature1.chromosomeList[i].genes[:cutIndex] +
+                creature2.chromosomeList[i].genes[cutIndex:]))
+        return creature.Creature(chromo)

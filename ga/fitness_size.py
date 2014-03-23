@@ -19,26 +19,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+import rhinoscriptsyntax as rs
 
-class Creature:
-    def __init__(self, chromosomeList):
-        self.chromosomeList = chromosomeList
-        self.renderedGenes = []
-        self.fitnessScore = 0
-        self.validate()
+class fitnessSize:
+    def __init__(self):
+        return
 
-    def validate(self):
-        if type(self.chromosomeList) is not list:
-            raise TypeError("Creature must get a list of chromosomes. "+str(type(self.chromosomeList))+" given instead")
+    def score(self, creature):
 
-        for chrmsm in self.chromosomeList:
-            if chrmsm.__class__.__name__ != 'Chromosome':
-                raise TypeError("Creature must get Chromosome object. "+str(chrmsm.__class__.__name__)+" given instead")
-            else:
-                chrmsm.validate()
+        #find bounding box
+        minX = minY = minZ = 0
+        maxX = maxY = maxZ = 0
+        counter = 0
+        for chromosome in creature.chromosomeList:
 
-
-    def render(self, locX=0, locY=0, locZ=0):
-        for chromosome in self.chromosomeList:
             for gene in chromosome.genes:
-                self.renderedGenes.append(gene.render(locX, locY, locZ))
+                for point in gene.points:
+                    if point[0] > maxX: maxX = point[0]
+                    if point[1] > maxY: maxY = point[1]
+                    if point[2] > maxZ: maxZ = point[2]
+
+                    if point[0] < minX: minX = point[0]
+                    if point[1] < minY: minY = point[1]
+                    if point[2] < minZ: minZ = point[2]
+
+                    counter+=1
+
+        return abs(maxX-minX) * abs(maxY-minY) * abs(maxZ-minZ)/counter
+

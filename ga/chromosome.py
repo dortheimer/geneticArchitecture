@@ -26,41 +26,15 @@ from ga import gene
 class Chromosome:
     def __init__(self, geneList):
         self.genes = geneList
+        self.validate()
 
     def grow(self, growSize=20):
         for index in range(growSize):
-            removeIndex = random.randint(0,self.genes[index].size()-1)
-
-            #find plane center
-            planePts = []
-            for i in range(self.genes[index].size()):
-                if (i!=removeIndex):
-                    planePts.append(self.genes[index].points[i])
-
-            planeCenter = self.findCenter(planePts)
-
-            opposite = [
-                2*planeCenter[0]-self.genes[index].points[removeIndex][0],
-                2*planeCenter[1]-self.genes[index].points[removeIndex][1],
-                2*planeCenter[2]-self.genes[index].points[removeIndex][2]]
-
-            point = [
-                opposite[0]+random.random()*4-2 ,
-                opposite[1]+random.random()*4-2,
-                opposite[2]+random.random()*4-2]
-
-            planePts.append(point)
-            newGene = gene.Gene(planePts)
-
+            newGene = self.genes[index].grow()
             self.genes.append(newGene)
 
-    def findCenter(self, pts):
-        x = y = z = 0
 
-        l = len(pts)
-        for i in range(l):
-            x+= pts[i][0]
-            y+= pts[i][1]
-            z+= pts[i][2]
-
-        return [x/l, y/l, z/l]
+    def validate(self):
+        for gene in self.genes:
+            if gene.__class__.__name__ != "Gene":
+                raise TypeError("Chromosome must get gene object,"+gene.__class__.__name__+" given instead")

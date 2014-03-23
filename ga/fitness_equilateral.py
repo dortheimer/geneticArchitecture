@@ -19,26 +19,34 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+import rhinoscriptsyntax as rs
 
-class Creature:
-    def __init__(self, chromosomeList):
-        self.chromosomeList = chromosomeList
-        self.renderedGenes = []
-        self.fitnessScore = 0
-        self.validate()
+class fitnessEquilateral:
+    def __init__(self):
+        return
 
-    def validate(self):
-        if type(self.chromosomeList) is not list:
-            raise TypeError("Creature must get a list of chromosomes. "+str(type(self.chromosomeList))+" given instead")
-
-        for chrmsm in self.chromosomeList:
-            if chrmsm.__class__.__name__ != 'Chromosome':
-                raise TypeError("Creature must get Chromosome object. "+str(chrmsm.__class__.__name__)+" given instead")
-            else:
-                chrmsm.validate()
-
-
-    def render(self, locX=0, locY=0, locZ=0):
-        for chromosome in self.chromosomeList:
+    def score(self, creature):
+        totalScore = 0
+        genesCount = 0
+        for chromosome in creature.chromosomeList:
             for gene in chromosome.genes:
-                self.renderedGenes.append(gene.render(locX, locY, locZ))
+                totalScore+= self.geneSymetryScore(gene)
+                genesCount+=1
+        return totalScore/genesCount
+
+    def geneSymetryScore(self, gene):
+        distances = []
+        # get distances
+        for point1 in gene.points:
+            for point2 in gene.points:
+                distances.append(rs.Distance(point1,point2))
+
+        offsets = []
+        # get offsets
+        for dis1 in distances:
+            for dis2 in distances:
+                if dis1 and dis2:
+                    offset = abs(dis1-dis2)
+                    offsets.append(offset)
+
+        return float(sum(offsets))/len(offsets)
