@@ -24,8 +24,11 @@ import random
 from ga import gene
 
 class Chromosome:
-    def __init__(self, geneList):
-        self.genes = geneList
+    def __init__(self, geneList=False):
+        if geneList is False:
+            self.genes = []
+        else:
+            self.genes = geneList
         self.validate()
 
     def grow(self, growSize=20):

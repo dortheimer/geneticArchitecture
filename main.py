@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-from ga import gene, chromosome, creature, evolution, fitness_equilateral, fitness_size, reproduction_divider
+from ga import gene, chromosome, creature, evolution, fitness_equilateral, fitness_size, reproduction_divider, reproduction_merger
 
 
 def main():
@@ -38,7 +38,8 @@ def main():
         '500': fitness_equilateral.fitnessEquilateral(),
         '0.3': fitness_size.fitnessSize()
     }
-    reproductionAlgorithm = reproduction_divider.reproductionDivider()
+    # reproductionAlgorithm = reproduction_divider.reproductionDivider()
+    reproductionAlgorithm = reproduction_merger.reproductionMerger()
 
     engine = evolution.Evolution(creatures)
     engine.population = engine.fitness(fitnessAlgorithms, 15)
