@@ -32,7 +32,7 @@ class Evolution:
         for creature in self.population:
             score = 0
             #loop on algorithms and sum the score
-            for weight, algorithm in fitnessAlgorithms.iteritems():
+            for weight, algorithm in fitnessAlgorithms.items():
                 score+= float(weight) * algorithm.score(creature)
                 # print ([float(weight), algorithm.score(creature)])
             creature.fitnessScore = score
@@ -53,5 +53,4 @@ class Evolution:
             for creature2 in self.population:
                 creature = reproductionAlgorithm.mitosis(creature1, creature2)
                 newCreatures.append(creature)
-        print(len(newCreatures))
         return newCreatures

@@ -21,32 +21,42 @@
 # THE SOFTWARE.
 # import rhinoscriptsyntax as rs
 
-class fitnessEquilateral:
+class fitnessVolume:
     def __init__(self):
         return
 
+    def determinant_3x3(self, m):
+        return (m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+                m[1][0] * (m[0][1] * m[2][2] - m[0][2] * m[2][1]) +
+                m[2][0] * (m[0][1] * m[1][2] - m[0][2] * m[1][1]))
+
+
+    def subtract(self, a, b):
+        return (a[0] - b[0],
+                a[1] - b[1],
+                a[2] - b[2])
+
+    def volume(self,points):
+        return abs(self.determinant_3x3((self.subtract(points[0], points[1]), self.subtract(points[1], points[2]), self.subtract(points[2], points[3])))) / 6.0
+
+
     def score(self, creature):
-        totalScore = 0
-        genesCount = 0
+
+        #find bounding box
+        volume = 0
+        list = []
         for chromosome in creature.chromosomeList:
+
             for gene in chromosome.genes:
-                totalScore+= self.geneSymetryScore(gene)
-                genesCount+=1
-        return totalScore/genesCount
 
-    def geneSymetryScore(self, gene):
-        distances = []
-        # get distances
-        for point1 in gene.points:
-            for point2 in gene.points:
-                distances.append(rs.Distance(point1,point2))
+                for point in gene.points:
 
-        offsets = []
-        # get offsets
-        for dis1 in distances:
-            for dis2 in distances:
-                if dis1 and dis2:
-                    offset = abs(dis1-dis2)
-                    offsets.append(offset)
+                    if len(list)>3:
+                        list.pop(1)
+                    list.append(point)
+                    if len(list)==4:
+                        volume+=self.volume(list);
 
-        return float(sum(offsets))/len(offsets)
+
+        return volume
+
